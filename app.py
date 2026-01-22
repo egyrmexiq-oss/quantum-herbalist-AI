@@ -126,7 +126,7 @@ with st.sidebar:
     if st.button("🔒 Salir"): st.session_state.usuario_activo = None; st.rerun()
 
     st.markdown("---")
-    st.markdown("### 🛋️ Encuentra Psicólogo")
+    st.markdown("### 🛋️ Encuentra Especialistas")
     #if TODOS_LOS_PSICOLOGOS:
     if TODOS_LOS_ESPECIALISTAS:
         filtro = st.selectbox("📍 Ciudad:", ciudades)
