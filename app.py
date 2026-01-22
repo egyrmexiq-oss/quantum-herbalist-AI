@@ -74,7 +74,7 @@ if TODOS_LOS_PSICOLOGOS:
     info_psi = [f"Nombre: {m.get('nombre')} | Especialidad: {m.get('especialidad')} | Ubicación: {m.get('ciudad')}" for m in TODOS_LOS_PSICOLOGOS]
     TEXTO_DIRECTORIO = "\n".join(info_psi)
     
-    # 🧠 EL PROMPT NUEVO (EMPATÍA + SEGURIDAD)
+    # 🌿" EL PROMPT NUEVO (EMPATÍA + SEGURIDAD)
     INSTRUCCION_EXTRA = f"""
     ERES EL "MASTER HERBALIST DE QUANTUM HERBAL". Tu especialidad es la fitoterapia avanzada, 
     las plantas medicinales y la etnobotánica con respaldo científico.
