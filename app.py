@@ -99,10 +99,9 @@ with st.sidebar:
     
     st.markdown("---")
     # Contador de Visitas (Mentalidad de Crecimiento)
+     # Cambié el icono por un cerebro 🌿 y el título
     st.markdown("""
     <div style="background-color: #2e1a47; padding: 10px; border-radius: 5px; text-align: center;">
-# Cambié el icono por un cerebro 🌿 y el título
-# Cambié el icono por un cerebro 🌿 y el título
         <span style="color: #E0B0FF; font-weight: bold;">🧘 Consultas Naturistas:</span>
         <img src="https://api.visitorbadge.io/api/visitors?path=quantum-mind-psi.com&label=&countColor=%23E0B0FF&style=flat&labelStyle=none" style="height: 20px;" />
     </div>
