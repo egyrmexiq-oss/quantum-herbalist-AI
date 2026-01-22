@@ -93,8 +93,8 @@ else:
 # 🧘 3. INTERFAZ ZEN (BARRA LATERAL)
 # ==========================================
 with st.sidebar:
-    st.header("🧠 Quantum Mind")
-    st.caption("Salud Mental & Bienestar")
+    st.header("🧠 Quantum Herbal")
+    st.caption("Salud Natural")
     st.success(f"Hola, {st.session_state.usuario_activo}")
     
     st.markdown("---")
@@ -109,7 +109,11 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### ⚙️ Preferencias")
     # Cambié los niveles para que sean más humanos
-    nivel = st.radio("Profundidad:", ["Escucha Breve", "Apoyo Emocional", "Orientación Teórica"])
+    # Código Original (probablemente)
+nivel_detalle = st.sidebar.radio(
+    "Elige la profundidad:",
+    ["Respuesta Rápida", "Explicación Detallada", "Modo Experto"]
+)
     
     if st.button("🍃 Nueva Sesión"): st.session_state.mensajes = []; st.rerun()
     if st.button("🔒 Salir"): st.session_state.usuario_activo = None; st.rerun()
