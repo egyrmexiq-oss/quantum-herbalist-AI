@@ -42,7 +42,7 @@ try: genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 except: st.error("Falta API Key")
 
 # ⚠️ OJO: AQUÍ DEBES PEGAR EL LINK DE TU NUEVA HOJA DE PSICÓLOGOS 👇
-URL_GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBFtqUTpPEcOvfXZteeYZJBEzcoucLwN9OYlLRvbAGx_ZjIoQsg1fzqE6lOeDjoSTm4LWnoAnV7C4q/pub?output=csv" 
+URL_GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vScorv4waDQDzTU12V894rbHB142OMGqpWWDbVjsaR9C7CcV7udlBEtBxK-lJwDYAYgpEFOYSDdNzM9/pub?output=csv" 
 URL_FORMULARIO = "https://docs.google.com/forms/d/e/1FAIpQLSdaK-a8blh67PYxCGyREWOABEf96ZyV6PJnyetBggkymCCjRA/viewform?usp=header"
 
 @st.cache_data(ttl=60)
