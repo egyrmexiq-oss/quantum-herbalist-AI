@@ -68,7 +68,7 @@ def cargar_especialistas():
 
 TODOS_LOS_ESPECIALISTAS = cargar_especialistas()
 
-# --- CEREBRO DEL DIRECTORIO (HERBAL & NATURISTA) ---
+# --- CEREBRO DEL DIRECTORIO (HERBAL & NATURISTA) ---    
 if TODOS_LOS_ESPECIALISTAS:
     # 1. Organizamos las ciudades
     ciudades = sorted(list(set(str(m.get('ciudad', 'General')).title() for m in TODOS_LOS_ESPECIALISTAS)))
@@ -128,7 +128,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 🛋️ Encuentra Psicólogo")
     #if TODOS_LOS_PSICOLOGOS:
-     if TODOS_LOS_ESPECIALISTAS:
+    if TODOS_LOS_ESPECIALISTAS:
         filtro = st.selectbox("📍 Ciudad:", ciudades)
         lista = TODOS_LOS_ESPECIALISTAS if filtro == "Todas las Ubicaciones" else [m for m in TODOS_LOS_ESPECIALISTAS if str(m.get('ciudad')).title() == filtro]
         
