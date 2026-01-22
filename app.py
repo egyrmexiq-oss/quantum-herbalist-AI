@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 # ==========================================
 # ⚙️ CONFIGURACIÓN DE PÁGINA (AMBIENTE ZEN)
 # ==========================================
-# Cambié el icono por un cerebro 🧠 y el título
+# Cambié el icono por un cerebro 🌿 y el título
 st.set_page_config(page_title="Quantum Herbal", page_icon="🌿", layout="wide")
 
 # ==========================================
@@ -93,7 +93,7 @@ else:
 # 🧘 3. INTERFAZ ZEN (BARRA LATERAL)
 # ==========================================
 with st.sidebar:
-    st.header("🧠 Quantum Herbal")
+    st.header("🌿 Quantum Herbal")
     st.caption("Salud Natural")
     st.success(f"Hola, {st.session_state.usuario_activo}")
     
@@ -101,7 +101,9 @@ with st.sidebar:
     # Contador de Visitas (Mentalidad de Crecimiento)
     st.markdown("""
     <div style="background-color: #2e1a47; padding: 10px; border-radius: 5px; text-align: center;">
-        <span style="color: #E0B0FF; font-weight: bold;">🧘 Almas Ayudadas:</span>
+# Cambié el icono por un cerebro 🌿 y el título
+# Cambié el icono por un cerebro 🌿 y el título
+        <span style="color: #E0B0FF; font-weight: bold;">🧘 Consultas Naturistas:</span>
         <img src="https://api.visitorbadge.io/api/visitors?path=quantum-mind-psi.com&label=&countColor=%23E0B0FF&style=flat&labelStyle=none" style="height: 20px;" />
     </div>
     """, unsafe_allow_html=True)
@@ -151,12 +153,12 @@ with st.sidebar:
 # ==========================================
 
 # Título más suave
-st.markdown('<h1 style="text-align: center; color: #E0B0FF;">Quantum Mind</h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="text-align: center; color: #E0B0FF;">Quantum Herbalist</h1>', unsafe_allow_html=True)
 st.caption("Espacio seguro de escucha y orientación con IA")
 
 if "mensajes" not in st.session_state: 
     # Saludo inicial diferente
-    st.session_state.mensajes = [{"role": "assistant", "content": "Hola. Soy Quantum Mind. Este es un espacio seguro. ¿Qué hay en tu mente hoy?"}]
+    st.session_state.mensajes = [{"role": "assistant", "content": "Hola. Soy Quantum Herbalist. Este es un espacio seguro. ¿Qué hay en tu mente hoy?"}]
 
 for msg in st.session_state.mensajes:
     with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -166,9 +168,12 @@ if prompt := st.chat_input("Cuéntame cómo te sientes..."):
     st.chat_message("user").markdown(prompt)
     
     try:
-        full_prompt = f"Eres Quantum Mind (Modo: {nivel}). {INSTRUCCION_EXTRA}. Usuario dice: {prompt}."
-        # Usamos el modelo rápido 2.5 o Pro
-        res = genai.GenerativeModel('gemini-2.5-flash').generate_content(full_prompt)
+        # Aquí le damos la nueva identidad 🌿👇
+        full_prompt = f"Eres el Master Herbalist de Quantum Herbal (Modo: {nivel_detalle}). {INSTRUCCION_EXTRA}. Consulta del usuario: {prompt}."
+        
+        # OJO: Verifica si tu modelo es 'gemini-1.5-flash'. El 2.5 aún no es público estándar.
+        res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
+        
         st.session_state.mensajes.append({"role": "assistant", "content": res.text})
         st.rerun()
     except Exception as e: st.error(f"Error de conexión: {e}")
