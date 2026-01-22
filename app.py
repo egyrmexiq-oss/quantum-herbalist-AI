@@ -41,7 +41,7 @@ if not st.session_state.usuario_activo:
 try: genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 except: st.error("Falta API Key")
 
-# ⚠️ OJO: AQUÍ DEBES PEGAR EL LINK DE TU NUEVA HOJA DE PSICÓLOGOS 👇
+# ⚠️ OJO: AQUÍ DEBES PEGAR EL LINK DE TU NUEVA HOJA DE NATURISTAS 👇
 URL_GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vScorv4waDQDzTU12V894rbHB142OMGqpWWDbVjsaR9C7CcV7udlBEtBxK-lJwDYAYgpEFOYSDdNzM9/pub?output=csv" 
 URL_FORMULARIO = "https://docs.google.com/forms/d/e/1FAIpQLSdaK-a8blh67PYxCGyREWOABEf96ZyV6PJnyetBggkymCCjRA/viewform?usp=header"
 
@@ -63,16 +63,23 @@ def cargar_especialistas():
             return df[df['aprobado'].astype(str).str.upper().str.contains('SI')].to_dict(orient='records')
         return []
     except: return []
+#TODOS_LOS_PSICOLOGOS = caragr_especialistas()
+#TODOS_LOS_PSICOLOGOS = cargar_especialistas()
 
-TODOS_LOS_PSICOLOGOS = cargar_especialistas()
+TODOS_LOS_ESPECIALISTAS = cargar_especialistas()
 
-# --- CEREBRO DE PSICOLOGÍA ---
-if TODOS_LOS_PSICOLOGOS:
-    ciudades = sorted(list(set(str(m.get('ciudad', 'General')).title() for m in TODOS_LOS_PSICOLOGOS)))
+# --- CEREBRO DEL DIRECTORIO (HERBAL & NATURISTA) ---
+if TODOS_LOS_ESPECIALISTAS:
+    # 1. Organizamos las ciudades
+    ciudades = sorted(list(set(str(m.get('ciudad', 'General')).title() for m in TODOS_LOS_ESPECIALISTAS)))
     ciudades.insert(0, "Todas las Ubicaciones")
     
-    info_psi = [f"Nombre: {m.get('nombre')} | Especialidad: {m.get('especialidad')} | Ubicación: {m.get('ciudad')}" for m in TODOS_LOS_PSICOLOGOS]
-    TEXTO_DIRECTORIO = "\n".join(info_psi)
+    # 2. Preparamos la lista para que la IA la lea
+    # Cambiamos 'info_psi' por 'info_expertos'
+    info_expertos = [f"Nombre: {m.get('nombre')} | Especialidad: {m.get('especialidad')} | Ubicación: {m.get('ciudad')}" for m in TODOS_LOS_ESPECIALISTAS]
+    
+    # 3. Creamos el texto final del directorio
+    TEXTO_DIRECTORIO = "\n".join(info_expertos)
     
     # 🌿" EL PROMPT NUEVO (EMPATÍA + SEGURIDAD)
     INSTRUCCION_EXTRA = f"""
@@ -120,9 +127,10 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### 🛋️ Encuentra Psicólogo")
-    if TODOS_LOS_PSICOLOGOS:
+    #if TODOS_LOS_PSICOLOGOS:
+     if TODOS_LOS_ESPECIALISTAS:
         filtro = st.selectbox("📍 Ciudad:", ciudades)
-        lista = TODOS_LOS_PSICOLOGOS if filtro == "Todas las Ubicaciones" else [m for m in TODOS_LOS_PSICOLOGOS if str(m.get('ciudad')).title() == filtro]
+        lista = TODOS_LOS_ESPECIALISTAS if filtro == "Todas las Ubicaciones" else [m for m in TODOS_LOS_ESPECIALISTAS if str(m.get('ciudad')).title() == filtro]
         
         if lista:
             if "idx" not in st.session_state: st.session_state.idx = 0
