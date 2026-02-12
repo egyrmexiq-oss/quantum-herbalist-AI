@@ -10,7 +10,7 @@ import time
 # ==========================================
 # Cambié el icono por un cerebro 🌿 y el título
 st.set_page_config(page_title="Quantum Herbal", page_icon="🌿", layout="wide")
-
+voz.inyectar_css_footer() # <--- Para que el micro se vea bien abajo
 # ==========================================
 # 🔐 1. LOGIN (Igual que la otra App)
 # ==========================================
