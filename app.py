@@ -172,17 +172,62 @@ if "mensajes" not in st.session_state:
 for msg in st.session_state.mensajes:
     with st.chat_message(msg["role"]): st.markdown(msg["content"])
 
-if prompt := st.chat_input("Cuéntame cómo te sientes..."):
-    st.session_state.mensajes.append({"role": "user", "content": prompt})
-    st.chat_message("user").markdown(prompt)
-    
+# =========================================================
+# 🎤 ZONA DE INPUT MODULAR (Reemplaza líneas 167-177)
+# =========================================================
+
+# 1. Llamamos a la subrutina de input (Audio + Texto)
+st.markdown("---")
+# Usamos columnas para alinear bonito el micro y el texto
+c1, c2 = st.columns([1, 6])
+with c1:
+    audio_blob = st.audio_input("🎙️", key="input_voz_app")
+with c2:
+    texto_chat = st.chat_input("Cuéntame cómo te sientes...")
+
+# 2. Procesamos con el módulo 'utils_voz'
+prompt_usuario = None
+usar_voz = False
+
+# A) ¿Habló?
+if audio_blob:
+    transcripcion = voz.escuchar_usuario(audio_blob) # Llamada al módulo
+    if transcripcion:
+        prompt_usuario = transcripcion
+        usar_voz = True
+
+# B) ¿Escribió? (Si no hay audio)
+elif texto_chat:
+    prompt_usuario = texto_chat
+
+# 3. Lógica Principal (Si hay entrada)
+if prompt_usuario:
+    # Mostrar usuario
+    st.session_state.mensajes.append({"role": "user", "content": prompt_usuario})
+    with st.chat_message("user"):
+        st.markdown(prompt_usuario)
+
+    # --- CEREBRO (Tu lógica original adaptada) ---
     try:
-        # Aquí le damos la nueva identidad 🌿👇
-        full_prompt = f"Eres el Master Herbalist de Quantum Herbal (Modo: {nivel_detalle}). {INSTRUCCION_EXTRA}. Consulta del usuario: {prompt}."
+        # Construimos el prompt igual que antes
+        full_prompt = f"Eres Quantum Mind (Modo: {nivel}). {INSTRUCCION_EXTRA}. Usuario dice: {prompt_usuario}."
         
-        # OJO: Verifica si tu modelo es 'gemini-1.5-flash'. El 2.5 aún no es público estándar.
-        res = genai.GenerativeModel('gemini-2.5-flash').generate_content(full_prompt)
+        # Generamos respuesta (Asegúrate de usar el modelo correcto, aquí pongo 1.5-flash por estabilidad)
+        res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
+        texto_ia = res.text
         
-        st.session_state.mensajes.append({"role": "assistant", "content": res.text})
+        # Mostrar IA
+        st.session_state.mensajes.append({"role": "assistant", "content": texto_ia})
+        with st.chat_message("assistant"):
+            st.markdown(texto_ia)
+            
+            # --- SALIDA DE AUDIO MODULAR ---
+            if usar_voz:
+                voz.hablar_respuesta(texto_ia) # ¡Aquí la App habla sola!
+
+        # Forzamos recarga suave para actualizar historial si es necesario
+        time.sleep(0.5)
         st.rerun()
-    except Exception as e: st.error(f"Error de conexión: {e}")
+
+    except Exception as e:
+        st.error(f"Error de conexión: {e}")
