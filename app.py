@@ -214,7 +214,7 @@ if prompt_usuario:
         full_prompt = f"Eres Quantum Herbalist. Experta en plantas medicinales. {INSTRUCCION_EXTRA}. Usuario dice: {prompt_usuario}."
         
         # Generamos respuesta (Modelo 1.5 Flash recomendado)
-        res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
+        res = genai.GenerativeModel('gemini-2.0-flash').generate_content(full_prompt)
         texto_ia = res.text
         
         # Mostrar IA
