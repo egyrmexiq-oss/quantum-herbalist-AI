@@ -230,7 +230,7 @@ if prompt_usuario:
         with st.chat_message("assistant"):
             with st.spinner("Analizando plantas..."):
                 # Generar respuesta
-                res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
+                res = genai.GenerativeModel('gemini-2.0-flash').generate_content(full_prompt)
                 texto_ia = res.text
                 
                 st.markdown(texto_ia)
