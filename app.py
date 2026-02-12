@@ -173,72 +173,80 @@ for msg in st.session_state.mensajes:
     with st.chat_message(msg["role"]): st.markdown(msg["content"])
 
 # =========================================================
-# 🎤 ZONA DE INPUT MODULAR (CORREGIDO - SIN RERUN FORZADO)
+# 🎤 ZONA DE INPUT MODULAR (VERSIÓN FLUJO CONTINUO)
 # =========================================================
 
-# 0. Inicializar memoria de audio procesado
-if "ultimo_audio_procesado" not in st.session_state:
-    st.session_state.ultimo_audio_procesado = None
+# 0. Inicializar memoria para evitar loops
+if "ultimo_audio_id" not in st.session_state:
+    st.session_state.ultimo_audio_id = None
 
-# 1. Llamamos a la subrutina de input
 st.markdown("---")
+st.caption("🎙️ *Nota: Para enviar otro audio, solo vuelve a tocar el micrófono.*")
+
+# 1. Inputs (Diseño limpio)
 c1, c2 = st.columns([1, 6])
 with c1:
-    # Nota: Asegúrate de que 'key' sea único para esta APP (ej. herbalist)
-    audio_blob = st.audio_input("🎙️", key="input_voz_herbalist_v2") 
+    # Key única para esta app
+    audio_blob = st.audio_input("🎙️", key="input_herbalist_final") 
 with c2:
-    texto_chat = st.chat_input("Describe tus síntomas aquí...")
+    texto_chat = st.chat_input("Escribe tus síntomas o dudas...")
 
-# 2. Procesamos (CON CANDADO DE SEGURIDAD 🔒)
+# 2. Procesamiento Inteligente
 prompt_usuario = None
 usar_voz = False
+nuevo_audio_detectado = False
 
-# A) ¿Habló?
-# Validamos que sea audio NUEVO
-if audio_blob and audio_blob != st.session_state.ultimo_audio_procesado:
+# Lógica: ¿Es un audio NUEVO que no hemos procesado antes?
+if audio_blob and audio_blob != st.session_state.ultimo_audio_id:
+    nuevo_audio_detectado = True
+
+# DECISIÓN DE PRIORIDAD:
+# Si el usuario escribió texto, le damos prioridad al texto (aunque haya un audio viejo ahí)
+if texto_chat:
+    prompt_usuario = texto_chat
+    usar_voz = False # Si escribe, respondemos en texto (más rápido)
+
+# Si no escribió, pero hay un audio NUEVO, usamos el audio
+elif nuevo_audio_detectado:
     transcripcion = voz.escuchar_usuario(audio_blob)
     if transcripcion:
         prompt_usuario = transcripcion
         usar_voz = True
-        # Guardamos este audio como "ya visto"
-        st.session_state.ultimo_audio_procesado = audio_blob
+        # Marcamos este audio como "Ya procesado" para que no se repita
+        st.session_state.ultimo_audio_id = audio_blob
 
-# B) ¿Escribió?
-elif texto_chat:
-    prompt_usuario = texto_chat
-
-# 3. Lógica Principal
+# 3. Ejecución
 if prompt_usuario:
-    # Mostrar usuario
-    st.session_state.mensajes.append({"role": "user", "content": prompt_usuario})
+    # A) Mostrar mensaje del usuario inmediatamente
     with st.chat_message("user"):
         st.markdown(prompt_usuario)
+    st.session_state.mensajes.append({"role": "user", "content": prompt_usuario})
 
-    # --- CEREBRO HERBOLARIO ---
+    # B) Cerebro Herbolario
     try:
-        # Validamos que exista la variable de instrucción
         instruccion = INSTRUCCION_EXTRA if 'INSTRUCCION_EXTRA' in globals() else "Ayuda con herbolaria."
+        full_prompt = f"Eres Quantum Herbalist. {instruccion}. Usuario: {prompt_usuario}."
         
-        full_prompt = f"Eres Quantum Herbalist. Experta en plantas medicinales. {instruccion}. Usuario dice: {prompt_usuario}."
-        
-        # Usamos el modelo flash (más rápido para chat)
-        res = genai.GenerativeModel('gemini-2.0-flash').generate_content(full_prompt)
-        texto_ia = res.text
-        
-        # Mostrar IA
-        st.session_state.mensajes.append({"role": "assistant", "content": texto_ia})
         with st.chat_message("assistant"):
-            st.markdown(texto_ia)
-            
-            # --- SALIDA DE AUDIO MODULAR ---
-            if usar_voz:
-                # El módulo se encarga del autoplay
-                voz.hablar_respuesta(texto_ia) 
+            with st.spinner("Analizando plantas..."):
+                # Generar respuesta
+                res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
+                texto_ia = res.text
+                
+                st.markdown(texto_ia)
+                
+                # C) Audio de Salida (Sin cortar el flujo)
+                if usar_voz:
+                    voz.hablar_respuesta(texto_ia) 
+        
+        # Guardar en historial
+        st.session_state.mensajes.append({"role": "assistant", "content": texto_ia})
 
-        # --- ¡IMPORTANTE! ---
-        # Hemos eliminado time.sleep() y st.rerun().
-        # Dejamos que Streamlit termine el ciclo naturalmente.
-        # Esto da tiempo al navegador de cargar el audio sin cortarlo.
-
+        # D) TRUCO DE UX:
+        # No hacemos rerun forzado (para no cortar el audio).
+        # Pero el chat input de texto YA se limpió solo (es automático).
+        # El audio input se queda "lleno", pero nuestra lógica (elif nuevo_audio_detectado)
+        # lo ignorará hasta que grabes uno nuevo.
+        
     except Exception as e:
-        st.error(f"Error de conexión: {e}")
+        st.error(f"Error: {e}")
