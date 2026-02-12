@@ -222,7 +222,7 @@ if prompt_usuario:
         
         # Generamos respuesta
         # Nota: Si gemini-2.0 te da problemas, cambia a 'gemini-1.5-flash'
-        res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
+        res = genai.GenerativeModel('gemini-2.0-flash').generate_content(full_prompt)
         texto_ia = res.text
         
         # Mostrar IA
