@@ -173,27 +173,34 @@ for msg in st.session_state.mensajes:
     with st.chat_message(msg["role"]): st.markdown(msg["content"])
 
 # =========================================================
-# 🎤 ZONA DE INPUT MODULAR (Versión Herbalist)
+# 🎤 ZONA DE INPUT MODULAR (CORREGIDO - SIN LOOP)
 # =========================================================
 
-# 1. Llamamos a la subrutina de input (Audio + Texto)
+# 0. Inicializar memoria de audio procesado (PARA EVITAR EL LOOP)
+if "ultimo_audio_procesado" not in st.session_state:
+    st.session_state.ultimo_audio_procesado = None
+
+# 1. Llamamos a la subrutina de input
 st.markdown("---")
 c1, c2 = st.columns([1, 6])
 with c1:
-    audio_blob = st.audio_input("🎙️", key="input_voz_herbalist") # Key única para evitar conflictos
+    audio_blob = st.audio_input("🎙️", key="input_voz_herbalist")
 with c2:
     texto_chat = st.chat_input("Describe tus síntomas aquí...")
 
-# 2. Procesamos con el módulo 'utils_voz'
+# 2. Procesamos (CON CANDADO DE SEGURIDAD 🔒)
 prompt_usuario = None
 usar_voz = False
 
 # A) ¿Habló?
-if audio_blob:
+# VERIFICAMOS: Que haya audio Y que sea DIFERENTE al último procesado
+if audio_blob and audio_blob != st.session_state.ultimo_audio_procesado:
     transcripcion = voz.escuchar_usuario(audio_blob)
     if transcripcion:
         prompt_usuario = transcripcion
         usar_voz = True
+        # IMPORTANTE: Guardamos este audio como "ya visto"
+        st.session_state.ultimo_audio_procesado = audio_blob
 
 # B) ¿Escribió?
 elif texto_chat:
@@ -208,13 +215,14 @@ if prompt_usuario:
 
     # --- CEREBRO HERBOLARIO ---
     try:
-        # AQUI CAMBIAMOS EL NOMBRE 👇
-        # Nota: Asegúrate que 'INSTRUCCION_EXTRA' exista en tu código, 
-        # si no, bórralo de esta línea.
-        full_prompt = f"Eres Quantum Herbalist. Experta en plantas medicinales. {INSTRUCCION_EXTRA}. Usuario dice: {prompt_usuario}."
+        # Validamos que exista la variable, si no, ponemos un default
+        instruccion = INSTRUCCION_EXTRA if 'INSTRUCCION_EXTRA' in globals() else "Ayuda con herbolaria."
         
-        # Generamos respuesta (Modelo 1.5 Flash recomendado)
-        res = genai.GenerativeModel('gemini-2.0-flash').generate_content(full_prompt)
+        full_prompt = f"Eres Quantum Herbalist. Experta en plantas medicinales. {instruccion}. Usuario dice: {prompt_usuario}."
+        
+        # Generamos respuesta
+        # Nota: Si gemini-2.0 te da problemas, cambia a 'gemini-1.5-flash'
+        res = genai.GenerativeModel('gemini-1.5-flash').generate_content(full_prompt)
         texto_ia = res.text
         
         # Mostrar IA
@@ -224,9 +232,10 @@ if prompt_usuario:
             
             # --- SALIDA DE AUDIO MODULAR ---
             if usar_voz:
-                voz.hablar_respuesta(texto_ia) # ¡La Herbolaria te habla!
+                voz.hablar_respuesta(texto_ia)
 
-        time.sleep(0.5)
+        # Pequeña pausa para que el audio empiece a cargar antes del rerun
+        time.sleep(1) 
         st.rerun()
 
     except Exception as e:
